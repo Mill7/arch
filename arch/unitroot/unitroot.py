@@ -476,6 +476,8 @@ class UnitRootTest(object, metaclass=ABCMeta):
         self._test_name = ""
         self._title = ""
         self._summary_text: List[str] = []
+        self.coef_pvalue = None
+        self._res_summary = None
 
     def __str__(self) -> str:
         return self.summary().__str__()
@@ -653,6 +655,16 @@ class UnitRootTest(object, metaclass=ABCMeta):
         if self._trend != value:
             self._reset()
             self._trend = value
+
+    @property
+    def coeff_pvalue(self):
+        self._compute_if_needed()
+        return self._coeff_pvalue
+
+    @property
+    def res_summary(self):
+        self._compute_if_needed()
+        return self._res_summary
 
 
 class ADF(UnitRootTest, metaclass=AbstractDocStringInheritor):
@@ -1174,6 +1186,10 @@ class PhillipsPerron(UnitRootTest, metaclass=AbstractDocStringInheritor):
         }
 
         self._title = self._test_name + " (Z-" + self._test_type + ")"
+        
+        self._coeff_pvalue = resols.pvalues
+        
+        self._res_summary = resols.summary()
 
     @property
     def test_type(self) -> str:
